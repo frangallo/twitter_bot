@@ -13,7 +13,7 @@ class GospelQuoteService
     puts "Gospel: #{gospel}"
 
     puts 'Generating motivational quotes...'
-    quotes_prompt = "Based on the following gospel, generate three motivational quotes that will go viral on Twitter. You don't have to use a hashtag unless you think it's appropriate. If you do, only use one hashtag and only use one of the following: love, god, jesus, faith, hope, gospel, peace, happiness, blessed or believe. Only return the quotes. :\n Gospel:\n#{gospel}"
+    quotes_prompt = "Generate 3 inspiring quotes based on the provided daily Catholic gospel, tailored for millennials and younger generations to relate to and share on Twitter. The quotes should vary in tone and style, including casual, inspirational, modern, and reflective elements as appropriate for the message. The quotes should be crafted to go viral, and may optionally include one relevant hashtag from the following list: #love, #god, #jesus, #faith, #hope, #gospel, #peace, #happiness, #blessed, or #believe. Only return the quotes. :\n Gospel:\n#{gospel}"
     quotes = gpt4_request(quotes_prompt)
     puts "Quotes: #{quotes.inspect}"
 
