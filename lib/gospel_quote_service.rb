@@ -23,7 +23,7 @@ class GospelQuoteService
     puts "Favorite Quote: #{favorite_quote}"
 
     puts 'Generating a description for the image...'
-    description_prompt = "Provide a specific and detailed description of the given quote for a text-to-image AI model to generate a 4K image associated with it. The description should be less than 400 character and avoid asking the text-to-image AI model to generate images with words or hands. The description should not include the quote in it or reference the quote. In the description, specify the type of colors (warm, vibrant, etc.), the type of image (digital painting, oil painting, etc.), and the resolution that best represent the quote. Only return the description. Nothing else. :\n Quote :\n#{favorite_quote}"
+    description_prompt = "Provide a specific and detailed description of the given quote for a text-to-image AI model to generate a 4K image associated with it. The description should be less than 400 character and avoid asking the text-to-image AI model to generate images with words or hands. The description should also avoid describing facial expressions and should not include the quote in it or reference the quote. In the description, specify the type of colors (warm, vibrant, etc.), the type of image (digital painting, oil painting, etc.), and the resolution that best represent the quote. Only return the description. Nothing else. :\n Quote :\n#{favorite_quote}"
     quote_description = gpt4_request(description_prompt)
     puts "Image Description: #{quote_description}"
 
