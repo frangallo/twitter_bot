@@ -69,36 +69,18 @@ class TwitterService
     end
   end
 
-  def post_summary_tweet_thread(gospel_summary)
-    # Insert the newline character directly after the first sentence
-    gospel_summary.sub!(/(\.|\?|\!)\s+/, "\\1\n\u200B\n\n")
-
-
-    # Split the gospel_summary into sentences
-    sentences = gospel_summary.split(/(?<=[.?!])\s+/)
-
-    # Build tweet_chunks considering sentence boundaries and the 240-character limit
-    tweet_chunks = []
-    current_chunk = ""
-
-    sentences.each do |sentence|
-      if (current_chunk.length + sentence.length + 1) <= 240
-        current_chunk << ' ' unless current_chunk.empty?
-        current_chunk << sentence
-      else
-        tweet_chunks << current_chunk
-        current_chunk = sentence
-      end
-    end
-    tweet_chunks << current_chunk unless current_chunk.empty?
-
+  def post_summary_tweet_thread(gospel_summary_lines)
     # Create a reference to the previous tweet ID for threading
     previous_tweet_id = nil
 
-    tweet_chunks.each do |chunk|
-      # Prepare tweet_data with the chunk and in_reply_to_status_id (if available)
+    gospel_summary_lines.each_with_index do |line, index|
+      # Add a line break for the first tweet after the gospel reference
+      if index == 0
+        line.sub!('1/', "\\1\n\u200B\n\n1/")
+      end
+      # Prepare tweet_data with the line and in_reply_to_status_id (if available)
       tweet_data = {
-        "text": chunk
+        "text": line
       }
 
       if previous_tweet_id
@@ -116,10 +98,10 @@ class TwitterService
 
 
 
+
   def post_single_tweet(tweet_data)
     consumer = OAuth::Consumer.new(consumer_key, consumer_secret, site: 'https://api.twitter.com')
     token = OAuth::AccessToken.new(consumer, access_token, access_token_secret)
-
     response = token.post(
       'https://api.twitter.com/2/tweets',
       tweet_data.to_json,
