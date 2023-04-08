@@ -69,11 +69,83 @@ class TwitterService
     end
   end
 
+  def post_summary_tweet_thread(gospel_summary)
+    # Insert the newline character directly after the first sentence
+    gospel_summary.sub!(/(\.|\?|\!)\s+/, "\\1\n\u200B\n\n")
+
+
+    # Split the gospel_summary into sentences
+    sentences = gospel_summary.split(/(?<=[.?!])\s+/)
+
+    # Build tweet_chunks considering sentence boundaries and the 240-character limit
+    tweet_chunks = []
+    current_chunk = ""
+
+    sentences.each do |sentence|
+      if (current_chunk.length + sentence.length + 1) <= 240
+        current_chunk << ' ' unless current_chunk.empty?
+        current_chunk << sentence
+      else
+        tweet_chunks << current_chunk
+        current_chunk = sentence
+      end
+    end
+    tweet_chunks << current_chunk unless current_chunk.empty?
+
+    # Create a reference to the previous tweet ID for threading
+    previous_tweet_id = nil
+
+    tweet_chunks.each do |chunk|
+      # Prepare tweet_data with the chunk and in_reply_to_status_id (if available)
+      tweet_data = {
+        "text": chunk
+      }
+
+      if previous_tweet_id
+        tweet_data["reply"] = { "in_reply_to_tweet_id": previous_tweet_id }
+      end
+
+      # Send the tweet and store its ID for threading
+      tweet_post_response = post_single_tweet(tweet_data)
+      previous_tweet_id = tweet_post_response['id']
+    end
+  end
+
+
+
+
+
+
+  def post_single_tweet(tweet_data)
+    consumer = OAuth::Consumer.new(consumer_key, consumer_secret, site: 'https://api.twitter.com')
+    token = OAuth::AccessToken.new(consumer, access_token, access_token_secret)
+
+    response = token.post(
+      'https://api.twitter.com/2/tweets',
+      tweet_data.to_json,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = response.body.force_encoding('UTF-8')
+
+    if response.code == '201'
+      JSON.parse(response_body)['data']
+    else
+      raise "Error posting tweet: #{JSON.parse(response_body)}"
+    end
+  end
+
+
+
 
 
   class << self
     def post_tweet(quote, image_data)
       new.post_tweet(quote, image_data)
+    end
+
+    def post_summary_tweet_thread(gospel_summary)
+      new.post_summary_tweet_thread(gospel_summary)
     end
   end
 end

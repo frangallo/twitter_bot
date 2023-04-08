@@ -10,10 +10,10 @@ class GospelQuoteService
   def main
     puts 'Fetching the daily gospel...'
     gospel = fetch_gospel
-    puts "Gospel: #{gospel}"
+    puts "Gospel: #{gospel[:text]}"
 
     puts 'Generating motivational quotes...'
-    quotes_prompt = "Generate 3 inspiring quotes based on the provided daily Catholic gospel, tailored for millennials and younger generations to relate to and share on Twitter. The quotes should vary in tone and style, including casual, inspirational, modern, and reflective elements as appropriate for the message. The quotes should be crafted to go viral, and may optionally include one relevant hashtag from the following list: #love, #god, #jesus, #faith, #hope, #gospel, #peace, #happiness, #blessed, or #believe. Only return the quotes. :\n Gospel:\n#{gospel}"
+    quotes_prompt = "Generate 3 inspiring quotes based on the provided daily Catholic gospel, tailored for millennials and younger generations to relate to and share on Twitter. The quotes should vary in tone and style, including casual, inspirational, modern, and reflective elements as appropriate for the message. The quotes should be crafted to go viral, and may optionally include one relevant hashtag from the following list: #love, #god, #jesus, #faith, #hope, #gospel, #peace, #happiness, #blessed, or #believe. Only return the quotes. :\n Gospel:\n#{gospel[:text]}"
     quotes = gpt4_request(quotes_prompt)
     puts "Quotes: #{quotes.inspect}"
 
@@ -38,28 +38,29 @@ class GospelQuoteService
       puts "Error in main: #{e.message}"
   end
 
-  private
-
   def fetch_gospel
     url = 'https://bible.usccb.org/daily-bible-reading'
     parsed_page = fetch_page(url)
     gospel_header = find_gospel_header(parsed_page)
 
     if gospel_header
-      content_body = find_content_body(gospel_header)
+      content_body = find_gospel(gospel_header, 'content-body')
+      gospel_verse = find_gospel_verse(gospel_header, 'address')
     end
 
     if content_body
       gospel_text = content_body.inner_text.strip
-      gospel_text
+      {verse: gospel_verse, text: gospel_text }
     else
       Rails.logger.error "Error fetching daily gospel: content_body not found"
       nil
     end
-  rescue StandardError => e
-    Rails.logger.error "Error fetching daily gospel: #{e.message}"
-    nil
+    rescue StandardError => e
+      Rails.logger.error "Error fetching daily gospel: #{e.message}"
+      nil
   end
+
+  private
 
   def fetch_page(url)
     response = HTTParty.get(url)
@@ -70,15 +71,26 @@ class GospelQuoteService
     parsed_page.css('.name').find { |header| header.content.match?(/^\s*Gospel\s*$/) }
   end
 
-  def find_content_body(header)
+  def find_gospel(header, html_class)
     current_node = header.parent
-
     while current_node = current_node.next_element
-      return current_node if current_node['class'] == 'content-body'
+      return current_node if current_node['class'] == html_class
     end
 
     nil
   end
+
+  def find_child_with_class(parent, class_name)
+    parent.children.find { |child| child['class'] == class_name }
+  end
+
+  def find_gospel_verse(header, class_name)
+    address_node = find_child_with_class(header.parent, class_name)
+    return address_node.inner_text.strip if address_node
+
+    nil
+  end
+
 
   def gpt4_request(prompt)
     OpenaiServices::ChatgptService.call(prompt)

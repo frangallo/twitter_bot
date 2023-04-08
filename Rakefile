@@ -11,4 +11,10 @@ namespace :schedule do
     require_relative './lib/gospel_quote_service'
     GospelQuoteService.new.main
   end
+  
+  desc "Run the GospelSummaryService"
+  task gospel_summary_service: :environment do
+    require_relative './lib/gospel_summary_service'
+  GospelSummaryService.new.main
+  end
 end
