@@ -92,6 +92,8 @@ GEM
       unf (>= 0.0.5, < 1.0.0)
     equalizer (0.0.11)
     erubi (1.12.0)
+    ethon (0.16.0)
+      ffi (>= 1.15.0)
     ffi (1.15.5)
     ffi-compiler (1.0.1)
       ffi (>= 1.0.0)
@@ -250,6 +252,8 @@ GEM
       multipart-post (~> 2.0)
       naught (~> 1.0)
       simple_oauth (~> 0.3.0)
+    typhoeus (1.4.0)
+      ethon (>= 0.9.0)
     tzinfo (2.0.6)
       concurrent-ruby (~> 1.0)
     unf (0.1.4)
@@ -296,6 +300,7 @@ DEPENDENCIES
   stimulus-rails
   turbo-rails
   twitter
+  typhoeus
   tzinfo-data
   web-console
   webdrivers

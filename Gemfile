@@ -30,6 +30,7 @@ gem 'httparty'
 gem 'nokogiri', '~> 1.14', '>= 1.14.2'
 gem 'rest-client'
 gem 'oauth'
+gem 'typhoeus'
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
 
