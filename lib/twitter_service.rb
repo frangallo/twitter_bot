@@ -92,7 +92,6 @@ class TwitterService
   end
 end
 
-
   def post_summary_tweet_thread(gospel_summary_lines)
     # Create a reference to the previous tweet ID for threading
     previous_tweet_id = nil
