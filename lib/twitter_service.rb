@@ -70,7 +70,7 @@ class TwitterService
   end
 
   def post_tweet_without_image(text)
-  text_utf8 = "Today's Daily Mantra:\n\n\u200B\n\n" + text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+  text_utf8 = "Today's Mantra\n\n\u200B\n\n" + text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
 
   tweet_data = {
     "text": text_utf8
