@@ -69,8 +69,8 @@ class TwitterService
     end
   end
 
-  def post_tweet_without_image(text)
-  text_utf8 = "Today's Mantra\n\n\u200B\n\n" + text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+  def post_tweet_without_image(text, opening_line)
+  text_utf8 = "#{opening_line}\n\n\u200B\n\n" + text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
 
   tweet_data = {
     "text": text_utf8
@@ -271,8 +271,8 @@ end
       new.post_tweet(quote, image_data)
     end
 
-    def post_tweet_without_image(text)
-      new.post_tweet_without_image(text)
+    def post_tweet_without_image(text, opening_line)
+      new.post_tweet_without_image(text, opening_line)
     end
 
     def post_summary_tweet_thread(gospel_summary)

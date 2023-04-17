@@ -18,7 +18,7 @@ class MantraService
     puts "Favorite Mantra: #{favorite_mantra}"
 
     puts 'Posting the tweet...'
-    TwitterService.post_tweet_without_image(favorite_mantra)
+    TwitterService.post_tweet_without_image(favorite_mantra, "🙏 Today's Mantra 🙏")
     puts 'Tweet posted!'
     rescue StandardError => e
       Rails.logger.error "Error in main: #{e.message}"

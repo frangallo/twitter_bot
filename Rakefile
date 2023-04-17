@@ -24,6 +24,12 @@ namespace :schedule do
     MantraService.new.main
   end
 
+  desc "Run the DailyApplicationService"
+  task gospel_daily_application_service: :environment do
+    require_relative './lib/gospel_daily_application_service'
+    GoseplDailyApplicationService.new.main
+  end
+
   desc "Follow users with the TwitterAutomationService"
   task follow_users: :environment do
     require_relative './lib/twitter_automation_service'
