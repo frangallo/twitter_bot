@@ -30,7 +30,7 @@ class GospelSummaryService
   end
 
   def summarize_gospel(gospel, first_tweet_text)
-    summary_prompt = "Create a Twitter thread summarizing the provided daily gospel passage in a way that is relatable and informative to millennials, with personal reflections or applications that illustrate the passage's message. Use concise language, avoid religious jargon, keep the summary under 1200 characters and start each tweet using a number/slash format (e.g. 1/). Incorporate relevant hashtags to increase visibility and engagement but only use one hashtag per tweet. The first tweet should start with #{first_tweet_text}. Make sure each tweet is under 280 characters. Return an array with each tweet as an element. The array should not be a string. Don't return anything else besides the array. :\n Gospel:\n#{gospel}"
+    summary_prompt = "Create a Twitter thread summarizing the provided daily gospel passage in a way that is relatable and informative to millennials, with personal reflections or applications that illustrate the passage's message. Use concise language, avoid religious jargon, keep the summary under 1200 characters and start each tweet using a number/slash format (e.g. 1/). Incorporate relevant hashtags to increase visibility and engagement but only use one hashtag per tweet. Don't include the word millenial in the thread. The first tweet should start with #{first_tweet_text}. Make sure each tweet is under 280 characters. Return an array with each tweet as an element. The array should not be a string. Don't return anything else besides the array. :\n Gospel:\n#{gospel}"
     gpt4_request(summary_prompt)
   end
 

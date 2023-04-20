@@ -14,7 +14,7 @@ class GoseplDailyApplicationService
     puts "Gospel: #{gospel[:text]}"
 
     puts 'Generate a daily application...'
-    daily_application_prompt = "Create a concise and memorable daily applications from the gospel below using contemporary phrasing and vocabulary that is practical in nature. The daily application should be 200 characters or less. Draw inspiration from popular self-help or personal development concepts, while staying true to the gospel's teachings. Focus on personal growth, mental well-being, and community impact, incorporating an element of empowerment to engage the millennial audience. Keep the tone uplifting and optimistic. Only return the daily application, nothing else. Gospel:\n#{gospel[:text]}"
+    daily_application_prompt = "Create a concise and memorable daily applications from the gospel below using contemporary phrasing and vocabulary that is practical in nature. The daily application should be 200 characters or less. Draw inspiration from popular self-help or personal development concepts, while staying true to the gospel's teachings. Focus on personal growth, mental well-being, and community impact, incorporating an element of empowerment to engage the millennial audience. Keep the tone uplifting and optimistic. Only return the daily application, nothing else. And don't mention the work millenial. Gospel:\n#{gospel[:text]}"
     daily_application = gpt4_request(daily_application_prompt)
 
 
