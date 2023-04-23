@@ -132,32 +132,28 @@ end
     end
   end
 
-  def get_following
-     endpoint_url = "https://api.twitter.com/2/users/me/following"
+  def get_following(user_id, next_token = nil)
+    url = "https://api.twitter.com/2/users/#{user_id}/following"
+    params = {
+      'max_results' => 1000,
+      'pagination_token' => next_token
+    }.compact
 
-     query_params = {
-       "max_results" => 1000,
-       "user.fields" => "created_at"
-     }
+    query_string = URI.encode_www_form(params)
+    full_url = "#{url}?#{query_string}"
 
-     options = {
-       method: 'get',
-       headers: {
-         "User-Agent" => "TwitterService",
-         "Authorization" => "Bearer #{@bearer_token}",
-       },
-       params: query_params
-     }
+    response = @token.get(full_url)
+    response_body = response.body.force_encoding('UTF-8')
 
-     request = Typhoeus::Request.new(endpoint_url, options)
-     response = request.run
+    if response.code == '200'
+      data = JSON.parse(response_body)
+      following = data['data']
+      [following, data['meta']['next_token']]
+    else
+      raise "Error getting following list: #{JSON.parse(response_body)}"
+    end
+  end
 
-     if response.code == 200
-       JSON.parse(response.body)['data']
-     else
-       raise "Error getting following: #{JSON.parse(response.body)}"
-     end
-   end
 
   def get_followers
     endpoint_url  = 'https://api.twitter.com/2/users/me/followers'
@@ -186,74 +182,69 @@ end
     end
   end
 
+  def search_users(user_id, next_token = nil)
+    url = "https://api.twitter.com/2/users/#{user_id}/followers"
+    params = {
+      'max_results' => 50,
+      'user.fields' => 'id,username,name,description,profile_image_url,created_at,public_metrics',
+      'pagination_token' => next_token
+    }.compact
 
-  def search_users(query)
-    endpoint_url = "https://api.twitter.com/2/users/by"
+    query_string = URI.encode_www_form(params)
+    full_url = "#{url}?#{query_string}"
 
-    query_params = {
-      "usernames" => query,
-      "user.fields" => "created_at,public_metrics"
-    }
+    response = @token.get(full_url)
+    response_body = response.body.force_encoding('UTF-8')
 
-    options = {
-      method: 'get',
-      headers: {
-        "User-Agent" => "TwitterService",
-        "Authorization" => "Bearer #{@bearer_token}",
-      },
-      params: query_params
-    }
-
-    request = Typhoeus::Request.new(endpoint_url, options)
-    response = request.run
-
-    if response.code == 200
-      JSON.parse(response.body)['data']
+    if response.code == '200'
+      data = JSON.parse(response_body)
+      users = data['data']
+      filtered_users = users.select { |user| user['description'].match?(/Jesus|Catholic|Christian|God/i) }
+      [filtered_users, data['meta']['next_token']]
     else
-      raise "Error searching users: #{JSON.parse(response.body)}"
+      raise "Error searching users: #{JSON.parse(response_body)}"
     end
   end
 
   def follow_user(target_user_id)
-    endpoint_url = "https://api.twitter.com/1.1/friendships/create.json"
+    endpoint_url = "https://api.twitter.com/2/users/1256062256330223623/following"
 
-    query_params = {
-      "user_id" => target_user_id,
-    }
+    body = {
+        "target_user_id" => target_user_id
+      }.to_json
 
     options = {
       method: 'post',
       headers: {
         "User-Agent" => "TwitterService",
-        "Authorization" => "Bearer #{@bearer_token}",
+        "Authorization" => oauth_header('POST', endpoint_url),
+        "Content-Type" => "application/json"
       },
-      params: query_params
+      body: body
     }
 
     request = Typhoeus::Request.new(endpoint_url, options)
     response = request.run
 
     if response.code == 200
-      JSON.parse(response.body)
+      user_data = JSON.parse(response.body)
+      puts "Successfully followed user: #{user_data['data']['username']} (ID: #{user_data['data']['id']})"
+      user_data
     else
       raise "Error following user: #{JSON.parse(response.body)}"
     end
   end
 
   def unfollow_user(target_user_id)
-    endpoint_url = "https://api.twitter.com/1.1/friendships/destroy.json"
-
-    query_params = {
-      "user_id" => target_user_id,
-    }
+    endpoint_url = "https://api.twitter.com/2/users/1256062256330223623/following/#{target_user_id}"
 
     options = {
-      method: 'post',
+      method: 'delete',
       headers: {
         "User-Agent" => "TwitterService",
-        "Authorization" => "Bearer #{@bearer_token}",
-      },
-      params: query_params
+        "Authorization" => oauth_header('DELETE', endpoint_url),
+        "Content-Type" => "application/json"
+      }
     }
 
     request = Typhoeus::Request.new(endpoint_url, options)
@@ -265,6 +256,48 @@ end
       raise "Error unfollowing user: #{JSON.parse(response.body)}"
     end
   end
+
+  def oauth_header(method, url)
+    require 'signet/oauth_1/client'
+
+    oauth_client = Signet::OAuth1::Client.new(
+      client_credential_key: @consumer_key,
+      client_credential_secret: @consumer_secret,
+      token_credential_key: @access_token,
+      token_credential_secret: @access_token_secret
+    )
+
+    oauth_client.generate_authenticated_request(
+      method: method,
+      uri: url
+    )['Authorization']
+  end
+
+  def get_users_data(user_id)
+    endpoint_url  = "https://api.twitter.com/2/users/#{user_id}"
+    query_params = {
+      "user.fields" => "id,username,name,description,created_at,public_metrics"
+    }
+    options = {
+      method: 'get',
+      headers: {
+        "User-Agent" => "TwitterService",
+        "Authorization" => "Bearer #{@bearer_token}",
+      },
+      params: query_params
+    }
+    request = Typhoeus::Request.new(endpoint_url, options)
+    response = request.run
+    if response.code == 200
+      JSON.parse(response.body)['data']
+    else
+      raise "Error getting user data: #{JSON.parse(response.body)}"
+    end
+  end
+
+
+
+
 
   class << self
     def post_tweet(quote, image_data)
@@ -298,6 +331,10 @@ end
 
     def unfollow_user(target_user_id)
       new.unfollow_user(target_user_id)
+    end
+
+    def get_users_data(user_id)
+      new.get_users_data(user_id)
     end
   end
 
