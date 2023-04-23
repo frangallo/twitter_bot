@@ -13,51 +13,48 @@ class TwitterAutomationService
     @twitter_service = TwitterService.new
   end
 
-  def should_follow?(user, following_ids)
+  def should_follow?(user)
     has_profile_pic = user['profile_image_url'].present?
-    has_keywords = user['description'].match?(/Jesus|Catholic|Christian|God/i)
+    has_keywords = user['description'].match?(/Jesus|Catholic|Lord|Amen|Christ|Christian|God/i)
     has_recent_tweet = (Time.now - Time.parse(user['created_at'])) <= 7 * 24 * 60 * 60
     has_enough_followers = user['public_metrics']['followers_count'] > 50
-    not_already_following = !following_ids.include?(user['id'])
 
-    has_profile_pic && has_keywords && has_recent_tweet && has_enough_followers && not_already_following
+    # Check if we're already following the user
+    not_already_followed = !FollowedUser.exists?(twitter_id: user['id'])
+
+    has_profile_pic && has_keywords && has_recent_tweet && has_enough_followers && not_already_followed
   end
 
   def follow_users
     followed_count = 0
-    user_ids = [26483706, 16588111,20545055, 5577902, 27500565, 47018380, 22000517, 23721478] # List of user IDs whose followers you want to fetch
+    user_ids = [26483706, 16588111, 20545055, 5577902, 27500565, 47018380, 22000517, 23721478] # List of user IDs whose followers you want to fetch
     your_user_id = 1256062256330223623;
+    random_user_id = user_ids.sample
 
-    # Fetch the list of users you're following
-    following_ids = []
-    next_token = nil
     loop do
-      following, next_token = @twitter_service.get_following(your_user_id, next_token)
-      following_ids.concat(following.map { |user| user['id'] })
-      break if next_token.nil?
-    end
+      break if followed_count >= FOLLOW_LIMIT
 
-    user_ids.each do |user_id|
-      next_token = nil
-
-      loop do
-        break if followed_count >= FOLLOW_LIMIT
-
-        users, next_token = @twitter_service.search_users(user_id, next_token)
-        users.each do |user|
-          if should_follow?(user, following_ids)
+      users, next_token = @twitter_service.search_users(random_user_id)
+      users.each do |user|
+        if should_follow?(user)
+          # Check if the user is already followed
+          followed_user = FollowedUser.find_by(twitter_id: user['id'])
+          if followed_user.nil?
+            # Add the user to the database
+            FollowedUser.create(twitter_id: user['id'])
             @twitter_service.follow_user(user['id'])
             followed_count += 1
             sleep FOLLOW_WAIT_TIME
           end
-
-          break if followed_count >= FOLLOW_LIMIT
         end
 
-        break if next_token.nil?
+        break if followed_count >= FOLLOW_LIMIT
       end
+
+      break if next_token.nil?
     end
   end
+
 
   def should_unfollow?(user)
     user_data = @twitter_service.get_users_data(user['id'])

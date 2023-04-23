@@ -185,7 +185,7 @@ end
   def search_users(user_id, next_token = nil)
     url = "https://api.twitter.com/2/users/#{user_id}/followers"
     params = {
-      'max_results' => 50,
+      'max_results' => 1000,
       'user.fields' => 'id,username,name,description,profile_image_url,created_at,public_metrics',
       'pagination_token' => next_token
     }.compact
@@ -195,6 +195,7 @@ end
 
     response = @token.get(full_url)
     response_body = response.body.force_encoding('UTF-8')
+
 
     if response.code == '200'
       data = JSON.parse(response_body)

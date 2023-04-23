@@ -32,6 +32,7 @@ gem 'rest-client'
 gem 'oauth'
 gem 'typhoeus'
 gem 'signet'
+gem 'pg'
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
 
