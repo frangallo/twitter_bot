@@ -33,14 +33,12 @@ namespace :schedule do
   desc "Follow users with the TwitterAutomationService"
   task follow_users: :environment do
     require_relative './lib/twitter_automation_service'
-    twitter_automation_service = TwitterAutomationService.new
-    twitter_automation_service.follow_users
+    TwitterAutomationService.new.follow_users
   end
 
   desc "Unfollow users with the TwitterAutomationService"
   task unfollow_users: :environment do
     require_relative './lib/twitter_automation_service'
-    twitter_automation_service = TwitterAutomationService.new
-    twitter_automation_service.unfollow_users
+    TwitterAutomationService.new.unfollow_users
   end
 end
