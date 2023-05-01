@@ -300,6 +300,7 @@ end
     endpoint_url = 'https://api.twitter.com/2/tweets/search/recent'
     query = "from:#{user_ids.join(' from:')} (#{keywords.join(' OR ')})"
     max_results = 100
+    start_time = (Time.now.utc - 10.minutes).iso8601
 
     options = {
       method: 'get',
@@ -310,7 +311,8 @@ end
       params: {
         "query": query,
         "tweet.fields": "author_id,created_at",
-        "max_results": max_results
+        "max_results": max_results,
+        "start_time": start_time
       }
     }
 
