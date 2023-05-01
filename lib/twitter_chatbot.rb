@@ -21,7 +21,7 @@ class TwitterStreamListener
     return if daily_reply_limit_reached?
 
     tweets = @twitter_service.fetch_tweets_from_users(TARGET_USER_IDS, KEYWORDS)
-    return if tweets.empty?
+    return if tweets.blank?
 
     # Shuffle the tweets to get a random order
     tweets.shuffle.each do |tweet|
