@@ -69,7 +69,7 @@ class TwitterStreamListener
   end
 
   def daily_reply_limit_reached?
-    TweetReply.where('created_at >= ?', Time.zone.now.beginning_of_day).count >= 10
+    TweetReply.where('created_at >= ?', Time.zone.now.beginning_of_day).count >= 15
   end
 
   def replied_to?(tweet_id)
