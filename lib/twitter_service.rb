@@ -92,14 +92,14 @@ class TwitterService
   end
 end
 
-  def post_summary_tweet_thread(gospel_summary_lines)
+  def post_summary_tweet_thread(gospel_summary_lines, first_tweet_text)
     # Create a reference to the previous tweet ID for threading
     previous_tweet_id = nil
 
     gospel_summary_lines.each_with_index do |line, index|
       # Add a line break for the first tweet after the gospel reference
       if index == 0
-        line.sub!('1/', "\\1\n\u200B\n\n1/")
+        line.gsub!(/#{Regexp.quote(first_tweet_text)}\s*(.*?)([:.])/m, "#{first_tweet_text}\n\n\u200B\n\n\\1\\2")
       end
       # Prepare tweet_data with the line and in_reply_to_status_id (if available)
       tweet_data = {
@@ -296,9 +296,33 @@ end
     end
   end
 
+  def fetch_tweets_from_users(user_ids, keywords)
+    endpoint_url = 'https://api.twitter.com/2/tweets/search/recent'
+    query = "from:#{user_ids.join(' from:')} (#{keywords.join(' OR ')})"
+    max_results = 100
 
+    options = {
+      method: 'get',
+      headers: {
+        "User-Agent" => "TwitterStreamListener",
+        "Authorization" => "Bearer #{bearer_token}"
+      },
+      params: {
+        "query": query,
+        "tweet.fields": "author_id,created_at",
+        "max_results": max_results
+      }
+    }
 
+    request = Typhoeus::Request.new(endpoint_url, options)
+    response = request.run
 
+    if response.code == 200
+      JSON.parse(response.body)['data']
+    else
+      raise "Error fetching tweets: #{JSON.parse(response.body)}"
+    end
+  end
 
   class << self
     def post_tweet(quote, image_data)
@@ -309,8 +333,8 @@ end
       new.post_tweet_without_image(text, opening_line)
     end
 
-    def post_summary_tweet_thread(gospel_summary)
-      new.post_summary_tweet_thread(gospel_summary)
+    def post_summary_tweet_thread(gospel_summary, first_tweet_text)
+      new.post_summary_tweet_thread(gospel_summary, first_tweet_text)
     end
 
     def get_following
@@ -336,6 +360,10 @@ end
 
     def get_users_data(user_id)
       new.get_users_data(user_id)
+    end
+
+    def fetch_tweets_from_users(user_ids, keywords)
+      new.fetch_tweets_from_users(user_ids, keywords)
     end
   end
 

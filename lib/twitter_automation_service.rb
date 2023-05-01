@@ -21,7 +21,7 @@ class TwitterAutomationService
   end
 
   def follow_users
-    user_ids = [26483706, 16588111, 20545055, 5577902, 27500565, 47018380, 22000517, 23721478] # List of user IDs whose followers you want to fetch
+    user_ids = [26483706, 403443988, 16588111, 20545055, 5577902, 27500565, 47018380, 22000517, 23721478] # List of user IDs whose followers you want to fetch
     your_user_id = 1256062256330223623;
     random_user_id = user_ids.sample;
     next_token = nil;

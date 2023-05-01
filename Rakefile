@@ -30,6 +30,12 @@ namespace :schedule do
     GoseplDailyApplicationService.new.main
   end
 
+  desc "Run the ChatBot"
+  task twitter_chatbot: :environment do
+    require_relative './lib/twitter_chatbot'
+    TwitterStreamListener.new.listen_and_reply
+  end
+
   desc "Follow users with the TwitterAutomationService"
   task follow_users: :environment do
     require_relative './lib/twitter_automation_service'
