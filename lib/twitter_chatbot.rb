@@ -4,8 +4,8 @@ require_relative 'twitter_service'
 require_relative 'openai_services'
 
 class TwitterStreamListener
-  TARGET_USER_IDS = [1616902805402394628, 21632108, 5577902, 12197852, 20545055, 16588111, 27500565, 47018380, 26483706, 22000517, 23721478, 403443988]
-  KEYWORDS = ['God','Christian','Lord','Christ','Love', 'love', 'Hope','hope', 'Father', 'pray', 'Jesus',
+  TARGET_USER_IDS = [331498740,14931614, 21632108, 5577902, 12197852, 20545055, 16588111, 27500565, 47018380, 26483706, 22000517, 23721478, 403443988]
+  KEYWORDS = ['Mass','Church','God','Christian','Lord','Christ','Love', 'love', 'Hope','hope', 'Father', 'pray', 'Jesus',
   "Genesis", "Exodus", "Leviticus", "Numbers",
   "Joshua", "Judges", "Job", "Psalms", "Proverbs",
   "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah",
