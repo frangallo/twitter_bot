@@ -298,32 +298,48 @@ end
 
   def fetch_tweets_from_users(user_ids, keywords)
     endpoint_url = 'https://api.twitter.com/2/tweets/search/recent'
-    query = "from:#{user_ids.join(' from:')} (#{keywords.join(' OR ')})"
-    max_results = 100
-    start_time = (Time.now.utc - 10.minutes).iso8601
+    keywords_string = keywords.join(' OR ')
+    fetched_tweets = []
 
-    options = {
-      method: 'get',
-      headers: {
-        "User-Agent" => "TwitterStreamListener",
-        "Authorization" => "Bearer #{bearer_token}"
-      },
-      params: {
-        "query": query,
-        "tweet.fields": "author_id,created_at",
-        "max_results": max_results,
-        "start_time": start_time
+    user_ids.each do |user_id|
+      query = "from:#{user_id} (#{keywords_string})"
+      max_results = 100
+      start_time = (Time.now.utc - 50.minutes).iso8601
+      puts "Query: #{query}"
+
+      options = {
+        method: 'get',
+        headers: {
+          "User-Agent" => "TwitterStreamListener",
+          "Authorization" => "Bearer #{bearer_token}"
+        },
+        params: {
+          "query": query,
+          "tweet.fields": "author_id,created_at",
+          "max_results": max_results,
+          "start_time": start_time
+        }
       }
-    }
 
-    request = Typhoeus::Request.new(endpoint_url, options)
-    response = request.run
+      request = Typhoeus::Request.new(endpoint_url, options)
+      response = request.run
 
-    if response.code == 200
-      JSON.parse(response.body)['data']
-    else
-      raise "Error fetching tweets: #{JSON.parse(response.body)}"
+      if response.code == 200
+        response_body = JSON.parse(response.body)
+        if response_body['data'].nil?
+          puts "No tweets found for user #{user_id}"
+          next
+        end
+        fetched_tweets += response_body['data']
+        response_meta = response_body['meta'] # Add this line to parse metadata
+        puts "Fetched #{fetched_tweets.size} tweets for user #{user_id}."
+        puts "Response metadata: #{response_meta}" # Add this line to print metadata
+      else
+        raise "Error fetching tweets: #{JSON.parse(response.body)}"
+      end
     end
+
+    fetched_tweets
   end
 
   class << self

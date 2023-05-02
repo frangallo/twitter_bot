@@ -4,13 +4,13 @@ require_relative 'twitter_service'
 require_relative 'openai_services'
 
 class TwitterStreamListener
-  TARGET_USER_IDS = [21632108, 5577902, 12197852, 20545055, 16588111, 27500565, 47018380, 26483706, 22000517, 23721478, 403443988]
-  KEYWORDS = ['God','Christ','Love', 'love', 'Hope','hope', 'Father', 'pray', 'Jesus',
+  TARGET_USER_IDS = [1616902805402394628, 21632108, 5577902, 12197852, 20545055, 16588111, 27500565, 47018380, 26483706, 22000517, 23721478, 403443988]
+  KEYWORDS = ['God','Christian','Lord','Christ','Love', 'love', 'Hope','hope', 'Father', 'pray', 'Jesus',
   "Genesis", "Exodus", "Leviticus", "Numbers",
   "Joshua", "Judges", "Job", "Psalms", "Proverbs",
-  "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah", "Lamentations",
+  "Ecclesiastes", "Song of Solomon", "Isaiah", "Jeremiah",
   "Matthew", "Mark", "Luke", "John", "Acts", "Romans",
-  "Hebrews", "James", "Peter", "John", "Jude", "Revelation"]
+  "Hebrews", "James", "Peter", "John", "Revelation"]
 
 
   def initialize
@@ -51,7 +51,7 @@ class TwitterStreamListener
   def generate_reply(tweet_text)
     prompt = "Craft a thoughtful and relatable reply that someone on Twitter would post for to the following tweet.
     The audience of the tweet reply is millennials and the tweet should match the tone of the original tweet.
-    Do not mention millennials in the reply and do not include hashtags. Only return the reply, nothing else. Do not include the reply in quotations. Tweet: #{tweet_text}."
+    Do not mention millennials in the reply and do not include hashtags. The reply should be less than 280 characters. Only return the reply, nothing else. Do not include the reply in quotations. Tweet: #{tweet_text}."
     OpenaiServices::ChatgptService.call(prompt)
   end
 
