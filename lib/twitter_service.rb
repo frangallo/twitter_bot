@@ -303,7 +303,7 @@ end
     user_ids.each_slice(7) do |user_slice|
       query = build_user_and_keyword_query(user_slice, keywords)
       max_results = 100
-      start_time = (Time.now.utc - 50.minutes).iso8601
+      start_time = (Time.now.utc - 10.minutes).iso8601
       puts "Query: #{query}"
 
       options = {
