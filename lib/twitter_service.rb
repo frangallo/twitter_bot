@@ -304,7 +304,7 @@ end
     user_ids.each do |user_id|
       query = "from:#{user_id} (#{keywords_string})"
       max_results = 100
-      start_time = (Time.now.utc - 50.minutes).iso8601
+      start_time = (Time.now.utc - 10.minutes).iso8601
       puts "Query: #{query}"
 
       options = {
