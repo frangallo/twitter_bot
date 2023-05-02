@@ -33,6 +33,8 @@ gem 'oauth'
 gem 'typhoeus'
 gem 'signet'
 gem 'pg'
+gem 'twilio-ruby'
+
 # Use Redis adapter to run Action Cable in production
 # gem "redis", "~> 4.0"
 
