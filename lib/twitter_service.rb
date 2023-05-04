@@ -70,27 +70,50 @@ class TwitterService
   end
 
   def post_tweet_without_image(text, opening_line)
-  text_utf8 = "#{opening_line}\n\n\u200B\n\n" + text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+    text_utf8 = "#{opening_line}\n\n\u200B\n\n" + text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
 
-  tweet_data = {
-    "text": text_utf8
-  }.to_json
+    tweet_data = {
+      "text": text_utf8
+    }.to_json
 
-  puts 'Posting tweet from inside post tweet...'
-  tweet_post_response = token.post(
-    'https://api.twitter.com/2/tweets',
-    tweet_data,
-    { 'Content-Type' => 'application/json' }
-  )
+    puts 'Posting tweet from inside post tweet...'
+    tweet_post_response = token.post(
+      'https://api.twitter.com/2/tweets',
+      tweet_data,
+      { 'Content-Type' => 'application/json' }
+    )
 
-  response_body = tweet_post_response.body.force_encoding('UTF-8')
+    response_body = tweet_post_response.body.force_encoding('UTF-8')
 
-  if tweet_post_response.code == '201'
-    JSON.parse(response_body)['data']['id']
-  else
-    raise "Error posting tweet: #{JSON.parse(response_body)}"
+    if tweet_post_response.code == '201'
+      JSON.parse(response_body)['data']['id']
+    else
+      raise "Error posting tweet: #{JSON.parse(response_body)}"
+    end
   end
-end
+
+  def post_tweet_without_image_or_opening_ling(text)
+    text_utf8 = text.encode('UTF-8', invalid: :replace, undef: :replace, replace: '')
+
+    tweet_data = {
+      "text": text_utf8
+    }.to_json
+
+    puts 'Posting tweet from inside post tweet...'
+    tweet_post_response = token.post(
+      'https://api.twitter.com/2/tweets',
+      tweet_data,
+      { 'Content-Type' => 'application/json' }
+    )
+
+    response_body = tweet_post_response.body.force_encoding('UTF-8')
+
+    if tweet_post_response.code == '201'
+      JSON.parse(response_body)['data']['id']
+    else
+      raise "Error posting tweet: #{JSON.parse(response_body)}"
+    end
+  end
 
   def post_summary_tweet_thread(gospel_summary_lines, first_tweet_text)
     # Create a reference to the previous tweet ID for threading
@@ -349,6 +372,10 @@ end
 
     def post_tweet_without_image(text, opening_line)
       new.post_tweet_without_image(text, opening_line)
+    end
+
+    def post_tweet_without_image_or_opening_ling(text)
+      new.post_tweet_without_image_or_opening_ling(text)
     end
 
     def post_summary_tweet_thread(gospel_summary, first_tweet_text)
