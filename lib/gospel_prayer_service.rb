@@ -13,9 +13,7 @@ class GospelPrayerService
     puts "Gospel: #{gospel[:text]}"
 
     puts 'Generating prayer...'
-    prayer_prompt = "Generate a prayer based on the given daily Catholic gospel, tailored for millennials and younger generations to share on Twitter.
-    Keep it under 280 characters, starting with 'Dear Lord,' followed by a new line, and ending with a new line, 'Amen,' and the prayer emoji.
-    The tone should vary, including casual, inspirational, modern, and reflective elements. :\n Gospel:\n #{gospel[:text]}"
+    prayer_prompt = "Generate a prayer based on the given daily Catholic gospel, tailored for millennials and younger generations to share on Twitter. Keep it under 280 characters, starting with 'Dear Lord,' followed by a new line, and ending with a new line, 'Amen,' and the prayer emoji. Do not inclue any other emojis. The tone should vary, including casual, inspirational, modern, and reflective elements. :\n Gospel:\n #{gospel[:text]}"
     prayer = gpt4_request(prayer_prompt)
     puts "Prayer: #{prayer.inspect}"
 
