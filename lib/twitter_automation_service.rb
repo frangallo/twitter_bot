@@ -64,10 +64,11 @@ class TwitterAutomationService
 
   def should_unfollow?(user)
     user_data = @twitter_service.get_users_data(user['id'])
-    not_priority_account = !TARGET_USER_IDS.includes(user['id'])
+    not_priority_account = !TARGET_USER_IDS.include?(user['id'].to_i)
     following_duration = Time.now - Time.parse(user_data['created_at'])
-    puts "User ID: #{user['id']} - Not following us: #{not_following_us} - Following duration: #{following_duration} - User data: #{user.inspect}"
-    not_priority_account && following_duration >= 5 * 24 * 60 * 60
+    debugger
+    puts "User ID: #{user['id']} - Following duration: #{following_duration} - User data: #{user.inspect}"
+    not_priority_account && (following_duration >= 5 * 24 * 60 * 60)
   end
 
   def unfollow_users
