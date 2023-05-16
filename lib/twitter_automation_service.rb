@@ -4,6 +4,13 @@ require 'time'
 require_relative 'twitter_service'
 
 class TwitterAutomationService
+    TARGET_USER_IDS = [1616902805402394628, 331498740,14931614, 21632108,
+    5577902, 12197852, 20545055, 16588111, 27500565, 47018380, 26483706,
+    22000517, 23721478, 403443988, 27379684, 36117822, 32150862, 4276531,
+    71715193, 32988140, 52150569, 20985527, 156012476, 33429434, 232252457,
+    34296240, 15809249, 1110475561, 111734160, 40332459, 20474254, 20124712,
+    109081861, 69358916, 1467903721673744392, 144078841, 27768807, 250781699, 110743000]
+
   def initialize
     @twitter_service = TwitterService.new
   end
@@ -57,10 +64,10 @@ class TwitterAutomationService
 
   def should_unfollow?(user)
     user_data = @twitter_service.get_users_data(user['id'])
-    not_following_us = !user['followed_by']
+    not_priority_account = !TARGET_USER_IDS.includes(user['id'])
     following_duration = Time.now - Time.parse(user_data['created_at'])
     puts "User ID: #{user['id']} - Not following us: #{not_following_us} - Following duration: #{following_duration} - User data: #{user.inspect}"
-    not_following_us && following_duration >= 5 * 24 * 60 * 60
+    not_priority_account && following_duration >= 5 * 24 * 60 * 60
   end
 
   def unfollow_users
